@@ -50,6 +50,11 @@ std::vector<Token> TokenBuilder::CodeToTokens(std::string_view code) {
                 }
                 break;
 
+            case '\n':
+                ConcludeToken(current_token, Tokens);
+                current_token.lineNumber += 1;
+                break;
+
             case '{':
             case '}':
             case ':':
