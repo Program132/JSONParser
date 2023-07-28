@@ -3,8 +3,10 @@
 #include <fstream>
 #include <vector>
 #include <optional>
+#include <map>
 
 #include "src/Tokenizer/Tokenizer.h"
+#include "src/Key/Key.h"
 
 std::optional<Token> ExpectKey(std::vector<Token>::const_iterator &current) {
     if (current->type == STRING) {
@@ -42,26 +44,37 @@ void ParseCode(const std::vector<Token>& tokenList) {
 
     int needClose = 1;
 
+    std::map<std::string, Key> keys;
+
     while (needClose > 0) {
-        auto key = ExpectKey(currentToken);
-        if (!key.has_value()) {
-            std::cerr  << "Forgot to say the key name" << std::endl;
+        auto key_name = ExpectKey(currentToken);
+        if (!key_name.has_value()) {
+            std::cerr  << "Forgot to say the key_name name" << std::endl;
         }
 
         if (!ExpectOperator(currentToken, ":").has_value()) {
-            std::cerr  << "':' to include the value to the key" << std::endl;
+            std::cerr  << "':' to include the key_value to the key_name" << std::endl;
         }
 
-        auto value = ExpectValue(currentToken);
-        if (!value.has_value()) {
-            std::cerr  << "Forgot to say the key value" << std::endl;
+        auto key_value = ExpectValue(currentToken);
+        if (!key_value.has_value()) {
+            std::cerr  << "Forgot to say the key_name key_value" << std::endl;
         }
 
         if (!ExpectOperator(currentToken, ",").has_value() && ExpectKey(currentToken)) {
-            std::cerr  << "',' to conclude the key" << std::endl;
+            std::cerr  << "',' to conclude the key_name" << std::endl;
         }
 
-        std::cout << key->content << "," << value->content << std::endl;
+        Key key(key_name->content, key_value->content);
+        if (key_value->type == INT) {
+            key.type = "int";
+        } else if (key_value->type == DOUBLE) {
+            key.type = "double";
+        } else {
+            key.type = "string";
+        }
+
+        keys[key_name->content] = key;
 
         if (ExpectOperator(currentToken, "}").has_value()) { needClose-=1; }
         else if (ExpectOperator(currentToken, "{").has_value()) { needClose+=1; }

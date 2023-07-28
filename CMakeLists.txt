@@ -5,4 +5,6 @@ set(CMAKE_CXX_STANDARD 23)
 
 add_executable(JSONParser main.cpp
         src/Tokenizer/Tokenizer.cpp
-        src/Tokenizer/Tokenizer.h)
+        src/Tokenizer/Tokenizer.h
+        src/Key/Key.cpp
+        src/Key/Key.h)
